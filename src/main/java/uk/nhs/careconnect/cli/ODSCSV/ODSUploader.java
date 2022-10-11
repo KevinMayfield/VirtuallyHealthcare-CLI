@@ -123,7 +123,7 @@ http://127.0.0.1:8080/careconnect-ri/STU3
 
             IRecordHandler handler = null;
 
-
+/*
             System.out.println("Pharmacy HQ");
             handler = new OrgHandler(this, CareConnectSystem.ODSOrganisationCode,"181","PHARMACY HEADQUARTER");
             uploadODSStu3(handler, targetServer, ctx, ',', QuoteMode.NON_NUMERIC, "epharmacyhq.zip", "epharmacyhq.csv");
@@ -142,7 +142,7 @@ http://127.0.0.1:8080/careconnect-ri/STU3
             handler = new OrgHandler(this,CareConnectSystem.ODSOrganisationCode, "98","CLINICAL COMMISSIONING GROUP");
             uploadODSStu3(handler, targetServer, ctx, ',', QuoteMode.NON_NUMERIC, "eccg.zip", "eccg.csv");
             //uploadOrganisation();
-
+*/
             System.out.println("General practice");
             handler = new OrgHandler(this,CareConnectSystem.ODSOrganisationCode,"76","GP PRACTICE");
             uploadODSStu3(handler, targetServer, ctx, ',', QuoteMode.NON_NUMERIC, "epraccur.zip", "epraccur.csv");uploadOrganisation();
@@ -361,15 +361,21 @@ TODO?
     private boolean checkUpdatedPractitionerRole(PractitionerRole practitionerRole, PractitionerRole tempPractitionerRole) {
         if (tempPractitionerRole.getActive() != practitionerRole.getActive()) return true;
 
-        if (practitionerRole.hasPractitioner() && tempPractitionerRole.getPractitioner().hasReference()) {
-            if (!tempPractitionerRole.hasPractitioner()) return true;
-            if (!tempPractitionerRole.getPractitioner().hasReference()) return true;
-            if (!tempPractitionerRole.getPractitioner().getReference().equals(practitionerRole.getPractitioner().getReference())) return true;
+        if (practitionerRole.hasPractitioner()) {
+            if ( practitionerRole.getPractitioner().hasReference()) {
+                if (!tempPractitionerRole.hasPractitioner()) return true;
+                if (!tempPractitionerRole.getPractitioner().hasReference()) return true;
+                if (!tempPractitionerRole.getPractitioner().getReference().equals(practitionerRole.getPractitioner().getReference()))
+                    return true;
+            }
         }
-        if (practitionerRole.hasOrganization() && tempPractitionerRole.getOrganization().hasReference()) {
-            if (!tempPractitionerRole.hasOrganization()) return true;
-            if (!tempPractitionerRole.getOrganization().hasReference()) return true;
-            if (!tempPractitionerRole.getOrganization().getReference().equals(practitionerRole.getOrganization().getReference())) return true;
+        if (practitionerRole.hasOrganization()) {
+            if (practitionerRole.getOrganization().hasReference()) {
+                if (!tempPractitionerRole.hasOrganization()) return true;
+                if (!tempPractitionerRole.getOrganization().hasReference()) return true;
+                if (!tempPractitionerRole.getOrganization().getReference().equals(practitionerRole.getOrganization().getReference()))
+                    return true;
+            }
         }
        // if (tempPractitionerRole.hasPractitioner() && !tempPractitionerRole.getPractitioner().hasReference() && practitionerRole.hasPractitioner()) return true;
         return false;
