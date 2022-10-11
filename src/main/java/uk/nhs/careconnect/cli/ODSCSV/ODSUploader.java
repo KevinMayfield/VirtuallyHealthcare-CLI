@@ -240,21 +240,21 @@ TODO?
 
         for (Practitioner practitioner : docs) {
             if (practitioner.getActive()) {
-                Practitioner tempPractitioner = getPractitionerById(practitioner.getIdentifier().get(0).getSystem(), practitioner.getIdentifier().get(0).getValue());
+                Practitioner awsPractitioner = getPractitionerById(practitioner.getIdentifier().get(0).getSystem(), practitioner.getIdentifier().get(0).getValue());
 
                 MethodOutcome outcome = null;
-                if (tempPractitioner != null) {
+                if (awsPractitioner != null) {
 
-                    practitioner.setId(tempPractitioner.getId());
+                    practitioner.setId(awsPractitioner.getId());
                     // Need to preserve identifiers on AWS
                     if (practitioner.getIdentifier() != null) {
-                        for (Identifier identifier : tempPractitioner.getIdentifier()) {
+                        for (Identifier identifier : awsPractitioner.getIdentifier()) {
                             if (!identifier.getValue().equals(practitioner.getIdentifier().get(0).getValue())) {
                                 practitioner.addIdentifier(identifier);
                             }
                         }
                     }
-                    if (checkUpdatedPractitioner(practitioner, tempPractitioner)) {
+                    if (checkUpdatedPractitioner(practitioner, awsPractitioner)) {
                         Integer retry = 3;
                         while (retry > 0) {
                             try {
@@ -296,7 +296,7 @@ TODO?
 
             if (practitionerRole.getActive()) {
 
-                PractitionerRole tempPractitionerRole = getPractitionerRoleById(practitionerRole.getIdentifier().get(0).getSystem(), practitionerRole.getIdentifier().get(0).getValue());
+                PractitionerRole awsPractitionerRole = getPractitionerRoleById(practitionerRole.getIdentifier().get(0).getSystem(), practitionerRole.getIdentifier().get(0).getValue());
 
                 if (practitionerRole.hasOrganization() && practitionerRole.getOrganization().hasIdentifier()) {
                     Organization organization = getOrganisationODS(practitionerRole.getOrganization().getIdentifier().getValue());
@@ -307,18 +307,18 @@ TODO?
                     if (practitioner != null) practitionerRole.getPractitioner().setReference("Practitioner/"+practitioner.getIdElement().getIdPart());
                 }
                 MethodOutcome outcome = null;
-                if (tempPractitionerRole != null) {
+                if (awsPractitionerRole != null) {
 
-                    practitionerRole.setId(tempPractitionerRole.getId());
+                    practitionerRole.setId(awsPractitionerRole.getId());
                     // Need to preserve identifiers on AWS
                     if (practitionerRole.getIdentifier() != null) {
-                        for (Identifier identifier : tempPractitionerRole.getIdentifier()) {
+                        for (Identifier identifier : awsPractitionerRole.getIdentifier()) {
                             if (!identifier.getValue().equals(practitionerRole.getIdentifier().get(0).getValue())) {
                                 practitionerRole.addIdentifier(identifier);
                             }
                         }
                     }
-                    if (checkUpdatedPractitionerRole(practitionerRole, tempPractitionerRole)) {
+                    if (checkUpdatedPractitionerRole(practitionerRole, awsPractitionerRole)) {
                         Integer retry = 3;
                         while (retry > 0) {
                             try {
@@ -358,39 +358,39 @@ TODO?
 
     }
 
-    private boolean checkUpdatedPractitionerRole(PractitionerRole practitionerRole, PractitionerRole tempPractitionerRole) {
-        if (tempPractitionerRole.getActive() != practitionerRole.getActive()) return true;
+    private boolean checkUpdatedPractitionerRole(PractitionerRole newPractitionerRole, PractitionerRole awsPractitionerRole) {
+        if (awsPractitionerRole.getActive() != newPractitionerRole.getActive()) return true;
 
-        if (practitionerRole.hasPractitioner()) {
-            if ( practitionerRole.getPractitioner().hasReference()) {
-                if (!tempPractitionerRole.hasPractitioner()) return true;
-                if (!tempPractitionerRole.getPractitioner().hasReference()) return true;
-                if (!tempPractitionerRole.getPractitioner().getReference().equals(practitionerRole.getPractitioner().getReference()))
+        if (newPractitionerRole.hasPractitioner()) {
+            if ( newPractitionerRole.getPractitioner().hasReference()) {
+                if (!awsPractitionerRole.hasPractitioner()) return true;
+                if (!awsPractitionerRole.getPractitioner().hasReference()) return true;
+                if (!awsPractitionerRole.getPractitioner().getReference().equals(newPractitionerRole.getPractitioner().getReference()))
                     return true;
             }
         }
-        if (practitionerRole.hasOrganization()) {
-            if (practitionerRole.getOrganization().hasReference()) {
-                if (!tempPractitionerRole.hasOrganization()) return true;
-                if (!tempPractitionerRole.getOrganization().hasReference()) return true;
-                if (!tempPractitionerRole.getOrganization().getReference().equals(practitionerRole.getOrganization().getReference()))
+        if (newPractitionerRole.hasOrganization()) {
+            if (newPractitionerRole.getOrganization().hasReference()) {
+                if (!awsPractitionerRole.hasOrganization()) return true;
+                if (!awsPractitionerRole.getOrganization().hasReference()) return true;
+                if (!awsPractitionerRole.getOrganization().getReference().equals(newPractitionerRole.getOrganization().getReference()))
                     return true;
             }
         }
-       // if (tempPractitionerRole.hasPractitioner() && !tempPractitionerRole.getPractitioner().hasReference() && practitionerRole.hasPractitioner()) return true;
+       // if (awsPractitionerRole.hasPractitioner() && !awsPractitionerRole.getPractitioner().hasReference() && practitionerRole.hasPractitioner()) return true;
         return false;
     }
 
-    private boolean checkUpdatedPractitioner(Practitioner practitioner, Practitioner tempPractitioner) {
-        if (tempPractitioner.getActive() != practitioner.getActive()) return true;
+    private boolean checkUpdatedPractitioner(Practitioner practitioner, Practitioner awsPractitioner) {
+        if (awsPractitioner.getActive() != practitioner.getActive()) return true;
 
         return false;
     }
 
-    private boolean checkUpdatedOrganization(Organization organization, Organization tempOrganization) {
-        if (tempOrganization.getActive() != organization.getActive()) return true;
-        if (organization.hasPartOf() && organization.getPartOf().hasReference() && !organization.getPartOf().getReference().contains(tempOrganization.getPartOf().getReference())) return true;
-        if (!tempOrganization.getTypeFirstRep().getCodingFirstRep().getCode().equals(organization.getTypeFirstRep().getCodingFirstRep().getCode())) return true;
+    private boolean checkUpdatedOrganization(Organization newOrganization, Organization awsOrganization) {
+        if (awsOrganization.getActive() != newOrganization.getActive()) return true;
+        if (newOrganization.hasPartOf() && newOrganization.getPartOf().hasReference() && !newOrganization.getPartOf().getReference().contains(awsOrganization.getPartOf().getReference())) return true;
+        if (!awsOrganization.getTypeFirstRep().getCodingFirstRep().getCode().equals(newOrganization.getTypeFirstRep().getCodingFirstRep().getCode())) return true;
         return false;
     }
 
